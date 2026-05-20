@@ -24,15 +24,25 @@ func home(w http.ResponseWriter, r *http.Request) {
 
 func getSchedule(w http.ResponseWriter, r *http.Request) {
 
+	files := []string{
+		"templates/base.html",
+		"templates/schedule.html",
+		"templates/week_view.html",
+	}
 	
-	ts, err := template.ParseFiles("templates/schedule.html")
+	ts, err := template.ParseFiles(files...)
 
 	if err != nil {
 		logAndSendError(w, err, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
 
-	err = ts.Execute(w, nil)
+	data := struct {
+		Days []int
+		Slots []int
+	}{Days: makeRange(0, 5), Slots: makeRange(0, 60)}
+
+	err = ts.ExecuteTemplate(w, "base", data)
 	if err != nil {
 		logAndSendError(w, err, "Internal Server Error", http.StatusInternalServerError)
 	}
@@ -45,6 +55,14 @@ func postSchedule(w http.ResponseWriter, r *http.Request) {
 
 func getApproval(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "Approval")
+}
+
+func makeRange(start, end int) []int {
+	var arr []int
+	for i := start; i < end; i++ {
+		arr = append(arr, i)
+	}
+	return arr
 }
 
 func logAndSendError(w http.ResponseWriter, err error, msg string, code int) {
@@ -62,6 +80,7 @@ func main() {
 
 	mux.HandleFunc("GET /{$}", home)
 	mux.HandleFunc("GET /schedule/{id}", getSchedule)
+	mux.HandleFunc("POST /schedule/{id}", postSchedule)
 	mux.HandleFunc("GET /approval", getApproval)
 
 	err := http.ListenAndServe(":4000", mux)

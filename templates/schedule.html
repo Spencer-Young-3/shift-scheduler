@@ -1,17 +1,76 @@
-<!doctype html>
-<html lang='en'>
-    <head>
-        <meta charset='utf-8'>
-        <title>Home - Snippetbox</title>
-    </head>
-    <body>
-        <header>
-            <h1><a href='/'>Snippetbox</a></h1>
-        </header>
-        <main>
-            <h2>Latest Snippets</h2>
-            <p>There's nothing to see here yet!</p>
-        </main>
-        <footer>Powered by <a href='https://go.dev/'>Go</a></footer>
-    </body>
-</html>
+{{define "title"}}Schedule{{end}}
+
+{{define "main"}}
+    <h2>Schedule</h2>
+    <form hx-post="schedule/12" hx-target="result">
+        {{template "week_view" .}}
+        <input type="hidden" name="slots" id="slots">
+        <button type="submit">Submit</button>
+    </form>
+
+<script>
+const scheduler = document.querySelector("#scheduler")
+const hidden = document.querySelector("#slots")
+
+const selected = new Set()
+
+let dragging = false
+let mode = "add"
+let touched = new Set()
+
+function syncHiddenInput() {
+    hidden.value = JSON.stringify([...selected])
+}
+
+function setSelected(el, active) {
+    el.classList.toggle("selected", active)
+}
+
+function processSlot(el) {
+    const slot = el.dataset.slot
+
+    if (touched.has(slot)) return
+    touched.add(slot)
+
+    if (mode === "add") {
+        selected.add(slot)
+        setSelected(el, true)
+    } else {
+        selected.delete(slot)
+        setSelected(el, false)
+    }
+
+    syncHiddenInput()
+}
+
+scheduler.addEventListener("pointerdown", e => {
+    const slot = e.target.closest(".slot")
+    if (!slot) return
+
+    dragging = true
+    touched.clear()
+
+    if (selected.has(slot.dataset.slot)){
+        mode = "remove"
+    } else {
+        mode = "add"
+    }
+
+    processSlot(slot)
+})
+
+scheduler.addEventListener("pointerover", e => {
+    if (!dragging) return
+
+    const slot = e.target.closest(".slot")
+    if (!slot) return
+
+    processSlot(slot)
+})
+
+window.addEventListener("pointerup", () => {
+    dragging = false
+})
+</script>
+{{end}}
+

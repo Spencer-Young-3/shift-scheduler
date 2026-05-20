@@ -1,8 +1,8 @@
 package models
 
-import (
-	"time"
-)
+// import (
+// 	"time"
+// )
 
 type User struct {
 	Id int
@@ -22,7 +22,7 @@ type Schedule struct {
 
 type Shift struct {
 	Id int
-	StartTime time.Duration
-	Endtime time.Duration
-	Day time.Weekday
+	StartTime int
+	Endtime int
+	Day int
 }

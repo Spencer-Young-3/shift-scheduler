@@ -1,0 +1,18 @@
+{{define "week_view"}}
+<div id="scheduler">
+    {{range $i := .Days}}
+        <div class="day-column" data-day="{{$i}}">
+            {{range $j := $.Slots}}
+                <button
+                    type="button"
+                    class="slot"
+                    data-day="{{$i}}"
+                    data-time="{{$j}}"
+                    data-slot="{{$i}}T{{$j}}">
+                    {{$j}}
+                </button>
+            {{end}}
+        </div>
+    {{end}}
+</div>
+{{end}}
