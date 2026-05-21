@@ -2,15 +2,16 @@
 <div id="scheduler">
     {{range $i := .Days}}
         <div class="day-column" data-day="{{$i}}">
-            {{range $j := $.Slots}}
-                <button
-                    type="button"
-                    class="slot"
-                    data-day="{{$i}}"
-                    data-time="{{$j}}"
-                    data-slot="{{$i}}T{{$j}}">
-                    {{$j}}
-                </button>
+            {{range  $j := $.HourRows}}
+                {{range $k := .Slots}}
+                    {{$key := printf "%vT%v" $i $k}}
+                    <button
+                        type="button"
+                        class="slot {{if index $.Schedule.Slots $key}} selected{{end}}"
+                        data-slot="{{$key}}">
+                        {{$j.Label}}
+                    </button>
+                {{end}}
             {{end}}
         </div>
     {{end}}

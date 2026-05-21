@@ -2,7 +2,7 @@
 
 {{define "main"}}
     <h2>Schedule</h2>
-    <form hx-post="schedule/12" hx-target="result">
+    <form hx-post="/schedule/{{$.Schedule.Id}}" hx-target="result">
         {{template "week_view" .}}
         <input type="hidden" name="slots" id="slots">
         <button type="submit">Submit</button>
