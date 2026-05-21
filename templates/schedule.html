@@ -2,16 +2,16 @@
 
 {{define "main"}}
     <h2>Schedule</h2>
-    <form hx-post="/schedule/{{$.Schedule.Id}}" hx-target="result">
+    <form id="schedule-form" hx-post="/schedule/{{$.Schedule.Id}}" hx-target="result">
         {{template "week_view" .}}
         <input type="hidden" name="slots" id="slots">
-        <button type="submit">Submit</button>
+        <button onclick="submitForm()"{{if ne $.Status "Draft"}} disabled{{end}}>Submit</button>
     </form>
 
 <script>
 const scheduler = document.querySelector("#scheduler")
 const hidden = document.querySelector("#slots")
-
+const myForm = document.getElementById('schedule-form')
 const selected = new Set()
 
 let dragging = false
@@ -22,6 +22,20 @@ function syncHiddenInput() {
     hidden.value = JSON.stringify([...selected])
 }
 
+function submitForm() {
+    updateSelected()
+    myForm.requestSubmit()
+}
+
+function updateSelected() {
+    let selected_elems = document.getElementsByClassName("selected")
+    Array.from(selected_elems).forEach(element => {
+        selected.add(element.dataset.slot)
+    });
+    console.log(selected)
+    syncHiddenInput()
+}
+
 function setSelected(el, active) {
     el.classList.toggle("selected", active)
 }
@@ -29,18 +43,18 @@ function setSelected(el, active) {
 function processSlot(el) {
     const slot = el.dataset.slot
 
-    if (touched.has(slot)) return
-    touched.add(slot)
+    // if (touched.has(slot)) return
+    // touched.add(slot)
 
-    if (mode === "add") {
-        selected.add(slot)
+    if (mode === "add" && !el.disabled) {
+        // selected.add(slot)
         setSelected(el, true)
     } else {
-        selected.delete(slot)
+        // selected.delete(slot)
         setSelected(el, false)
     }
 
-    syncHiddenInput()
+    // syncHiddenInput()
 }
 
 scheduler.addEventListener("pointerdown", e => {
@@ -50,7 +64,9 @@ scheduler.addEventListener("pointerdown", e => {
     dragging = true
     touched.clear()
 
-    if (selected.has(slot.dataset.slot)){
+    console.log(e.target.className)
+
+    if (selected.has(slot.dataset.slot) || e.target.className.includes('selected')){
         mode = "remove"
     } else {
         mode = "add"

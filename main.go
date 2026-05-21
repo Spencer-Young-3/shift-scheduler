@@ -4,9 +4,11 @@ import (
 	"fmt"
 	"log"
 	"html/template"	
+	"encoding/json"
 	"net/http"
 	"shiftscheduler.youngs3.byu.edu/internal/models"
 	"sync"
+	"strconv"
 )
 
 type HourRow struct{
@@ -84,9 +86,67 @@ func getSchedule(w http.ResponseWriter, r *http.Request) {
 
 func postSchedule(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusCreated)
+	// jsonData := []byte(r.FormValue("slots"))
 	log.Print("In Post")
 	log.Print(r.FormValue("slots"))
-	fmt.Fprintf(w, "Posted Schedule")
+	var slots []string
+	err := json.Unmarshal([]byte(r.FormValue("slots")), &slots)
+	if err != nil {
+		fmt.Println("Error: ", err)
+		return
+	}
+
+	newSlots := make(map[string]bool)
+	for i:=0; i < len(slots); i++ {
+		newSlots[slots[i]] = true
+	}
+
+	// mu.Lock()
+	// for k, v := range schedules[currentUser.ScheduleId].Slots {
+	// 	newSlots[k] = v
+	// }
+	// mu.Unlock()
+
+	valid := validateSchedule(newSlots)
+	if valid {
+		log.Print("Valid")
+		mu.Lock()
+		newSchedule := models.Schedule{
+			Id: currentUser.ScheduleId,
+			UserId: currentUser.Id,
+			Status: "Pending",
+			Slots: newSlots,
+		}
+		schedules[currentUser.ScheduleId] = newSchedule
+		mu.Unlock()
+	} else {
+		log.Print("Not Valid")
+	}
+
+	
+
+	// fmt.Fprintf(w, "Posted Schedule")
+}
+
+func validateSchedule(slots map[string]bool) bool {
+	log.Print(slots)
+	for day:=0; day<5; day++ {
+		count := 0
+		for slot:=0; slot<60; slot++ {
+			key := strconv.Itoa(day) + "T" + strconv.Itoa(slot)
+			_, ok := slots[key]
+			if ok {
+				count++
+			}
+			if (count > 0 && !ok) || (slot == 59 && count > 0) {
+				if count > 54 || count < 18 {
+					return false
+				}
+				count = 0
+			}
+		}
+	}
+	return true
 }
 
 func getApproval(w http.ResponseWriter, r *http.Request) {
