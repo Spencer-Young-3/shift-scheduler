@@ -1,0 +1,30 @@
+{{define "title"}}Approval{{end}}
+
+{{define "main"}}
+    <h2>Approval</h2>
+    <form id="approval-form" hx-post="/approval/{{$.Schedule.Id}}">
+        <button onclick="ApproveSchedule()">Approve</button>
+        <button onclick="RejectSchedule()">Reject</button>
+        <input id="status" type="hidden" value="" name="status"></input>
+        <textarea id="msg" name="msg"></textarea>
+    </form>
+    {{template "week_view" .}}
+
+<script>
+const status = document.getElementById("status")
+const myForm = document.getElementByid("approval-form")
+
+function ApproveSchedule() {
+    status.value = "Approved"
+    myForm.requestSubmit()
+}
+
+function RejectSchedule() {
+    status.value = "Rejected"
+    myForm.requestSubmit()
+}
+
+
+</script>
+
+{{end}}

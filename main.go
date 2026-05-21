@@ -48,17 +48,22 @@ func getSchedule(w http.ResponseWriter, r *http.Request) {
 	mu.Lock()
 	schedule, ok := schedules[currentUser.ScheduleId]
 	var status string
+	var msg *string
 	if ok {
 		status = schedule.Status
+		msg = schedule.Msg
 	}
+	user := currentUser
 	mu.Unlock()
 
 	data := struct {
 		Days []int
 		Slots []int
 		HourRows []HourRow
+		User models.User
 		Schedule models.Schedule
 		Status string
+		Msg *string
 	}{
 		Days: makeRange(0, 5), 
 		Slots: makeRange(0, 60),
@@ -74,8 +79,10 @@ func getSchedule(w http.ResponseWriter, r *http.Request) {
             {Label: "4pm",  Slots: []int{48, 49, 50, 51, 52, 53}},
             {Label: "5pm",  Slots: []int{54, 55, 56, 57, 58, 59}},
         },
+		User: user,
 		Schedule: schedule,
 		Status: status,
+		Msg: msg,
 	}
 
 	err = ts.ExecuteTemplate(w, "base", data)
@@ -85,7 +92,6 @@ func getSchedule(w http.ResponseWriter, r *http.Request) {
 }
 
 func postSchedule(w http.ResponseWriter, r *http.Request) {
-	w.WriteHeader(http.StatusCreated)
 	// jsonData := []byte(r.FormValue("slots"))
 	log.Print("In Post")
 	log.Print(r.FormValue("slots"))
@@ -107,8 +113,10 @@ func postSchedule(w http.ResponseWriter, r *http.Request) {
 	// }
 	// mu.Unlock()
 
+	// var newStatus string
 	valid := validateSchedule(newSlots)
 	if valid {
+		w.WriteHeader(http.StatusCreated)
 		log.Print("Valid")
 		mu.Lock()
 		newSchedule := models.Schedule{
@@ -116,20 +124,36 @@ func postSchedule(w http.ResponseWriter, r *http.Request) {
 			UserId: currentUser.Id,
 			Status: "Pending",
 			Slots: newSlots,
+			Msg: nil,
 		}
 		schedules[currentUser.ScheduleId] = newSchedule
+		// newStatus = newSchedule.Status
 		mu.Unlock()
 	} else {
 		log.Print("Not Valid")
 	}
 
-	
+	// response := fmt.Sprintf(
+	// 	"<h2 id=\"status-title\">%v</h2>",
+	// 	newStatus,
+	// )
 
-	// fmt.Fprintf(w, "Posted Schedule")
+	// w.Write([]byte(response))
+	ts, err := template.ParseFiles("templates/week_view.html")
+	if err != nil {
+		logAndSendError(w, err, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+	err = ts.Execute(w, nil)
+	if err != nil {
+		logAndSendError(w, err, "Internal Server Error", http.StatusInternalServerError)
+	}
+
 }
 
 func validateSchedule(slots map[string]bool) bool {
 	log.Print(slots)
+	overall_count := 0
 	for day:=0; day<5; day++ {
 		count := 0
 		for slot:=0; slot<60; slot++ {
@@ -137,6 +161,7 @@ func validateSchedule(slots map[string]bool) bool {
 			_, ok := slots[key]
 			if ok {
 				count++
+				overall_count++
 			}
 			if (count > 0 && !ok) || (slot == 59 && count > 0) {
 				if count > 54 || count < 18 {
@@ -146,11 +171,142 @@ func validateSchedule(slots map[string]bool) bool {
 			}
 		}
 	}
+	if overall_count < 10 || overall_count > 240 {
+		return false
+	}
 	return true
 }
 
 func getApproval(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "Approval")
+
+	if currentUser.Role != "admin" {
+		http.Error(w, "Forbidden", http.StatusForbidden)
+		return
+	}
+
+	files := []string{
+		"templates/base.html",
+		"templates/approval.html",
+		"templates/week_view.html",
+	}
+	
+	ts, err := template.ParseFiles(files...)
+
+	if err != nil {
+		logAndSendError(w, err, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+
+	id, err := strconv.Atoi(r.PathValue("schedule_id"))
+	if err != nil {
+		logAndSendError(w, err, "ID not valid", http.StatusInternalServerError)
+		return
+	}
+
+	mu.Lock()
+	schedule, ok := schedules[id]
+	var status string
+	var msg *string
+	if ok {
+		status = schedule.Status
+		msg = schedule.Msg
+	}
+	user := currentUser
+	mu.Unlock()
+
+	data := struct {
+		Days []int
+		Slots []int
+		HourRows []HourRow
+		User models.User
+		Schedule models.Schedule
+		Status string
+		Msg *string
+	}{
+		Days: makeRange(0, 5), 
+		Slots: makeRange(0, 60),
+		HourRows: []HourRow{
+            {Label: "8am",  Slots: []int{0, 1, 2, 3, 4, 5}},
+            {Label: "9am",  Slots: []int{6, 7, 8, 9, 10, 11}},
+            {Label: "10am", Slots: []int{12, 13, 14, 15, 16, 17}},
+            {Label: "11am", Slots: []int{18, 19, 20, 21, 22, 23}},
+            {Label: "12pm", Slots: []int{24, 25, 26, 27, 28, 29}},
+            {Label: "1pm",  Slots: []int{30, 31, 32, 33, 34, 35}},
+            {Label: "2pm",  Slots: []int{36, 37, 38, 39, 40, 41}},
+            {Label: "3pm",  Slots: []int{42, 43, 44, 45, 46, 47}},
+            {Label: "4pm",  Slots: []int{48, 49, 50, 51, 52, 53}},
+            {Label: "5pm",  Slots: []int{54, 55, 56, 57, 58, 59}},
+        },
+		User: user,
+		Schedule: schedule,
+		Status: status,
+		Msg: msg,
+	}
+
+	err = ts.ExecuteTemplate(w, "base", data)
+	if err != nil {
+		logAndSendError(w, err, "Internal Server Error", http.StatusInternalServerError)
+	}
+}
+
+func postApproval(w http.ResponseWriter, r *http.Request) {
+
+	if currentUser.Role != "admin" {
+		http.Error(w, "Forbidden", http.StatusForbidden)
+		return
+	}
+
+	id, err := strconv.Atoi(r.PathValue("schedule_id"))
+	if err != nil {
+		logAndSendError(w, err, "ID not valid", http.StatusInternalServerError)
+		return
+	}
+
+	log.Print("In Post")
+	log.Print(r.FormValue("status"))
+	log.Print(r.FormValue("msg"))
+
+	status := r.FormValue("status")
+	msg := r.FormValue("msg")
+
+	mu.Lock()
+	schedule, ok := schedules[id]
+	var userId int
+	var slots map[string]bool
+	if ok {
+		userId = schedule.UserId
+		slots = schedule.Slots
+	}
+	mu.Unlock()
+
+	newSchedule := models.Schedule{
+		Id: id,
+		UserId: userId,
+		Status: status,
+		Slots: slots,
+		Msg: &msg,
+	}
+
+	log.Print(newSchedule)
+
+	mu.Lock()
+	schedules[id] = newSchedule
+	mu.Unlock()
+
+	log.Print(schedules[id])
+}
+
+func switchUser(w http.ResponseWriter, r *http.Request) {
+	id, err := strconv.Atoi(r.FormValue("otherId"))
+	if err != nil {
+		logAndSendError(w, err, "Not a valid ID number", http.StatusInternalServerError)
+	}
+	log.Print(currentUser)
+	log.Print(id)
+	mu.Lock()
+	currentUser = users[id]
+	mu.Unlock()
+	log.Print(currentUser)
 }
 
 func makeRange(start, end int) []int {
@@ -175,8 +331,8 @@ func main() {
 	test_shift := make(map[string]bool)
 	test_shift["1T4"] = true
 
-	schedules[0] = models.Schedule{Id: 0, UserId: 0, Status: "Draft", Slots: test_shift}
-	schedules[1] = models.Schedule{Id: 1, UserId: 1, Status: "Draft", Slots: make(map[string]bool)}
+	schedules[0] = models.Schedule{Id: 0, UserId: 0, Status: "Draft", Slots: test_shift, Msg: nil}
+	schedules[1] = models.Schedule{Id: 1, UserId: 1, Status: "Draft", Slots: make(map[string]bool), Msg: nil}
 	currentUser = users[0]
 
 	fileServer := http.FileServer(http.Dir("static/"))
@@ -184,9 +340,11 @@ func main() {
 	mux.Handle("GET /static/", http.StripPrefix("/static", fileServer))
 
 	mux.HandleFunc("GET /{$}", home)
-	mux.HandleFunc("GET /schedule/{id}", getSchedule)
-	mux.HandleFunc("POST /schedule/{id}", postSchedule)
-	mux.HandleFunc("GET /approval", getApproval)
+	mux.HandleFunc("GET /schedule", getSchedule)
+	mux.HandleFunc("POST /schedule", postSchedule)
+	mux.HandleFunc("POST /switch-user", switchUser)
+	mux.HandleFunc("GET /approval/{schedule_id}", getApproval)
+	mux.HandleFunc("POST /approval/{schedule_id}", postApproval)
 
 	err := http.ListenAndServe(":4000", mux)
 	log.Fatal(err)

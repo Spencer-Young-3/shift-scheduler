@@ -20,6 +20,7 @@ type Schedule struct {
 	UserId int
 	Status string
 	Slots map[string]bool
+	Msg *string
 }
 
 // type Shift struct {

@@ -1,6 +1,7 @@
 {{define "week_view"}}
 <div id="scheduler">
-    <h2>{{.Status}}</h2>
+    <h2 id="status-title">{{.Status}}</h2>
+    <span>{{ if ne .Schedule.Msg nil }}{{.Schedule.Msg}}{{end}}</span>
     {{range $i := .Days}}
         <div class="day-column" data-day="{{$i}}">
             {{range  $j := $.HourRows}}
@@ -10,7 +11,7 @@
                         type="button"
                         class="slot {{if index $.Schedule.Slots $key}} selected{{end}}"
                         data-slot="{{$key}}"
-                        {{if ne $.Status "Draft"}} disabled{{end}}>
+                        {{if and (ne $.Status "Draft") (ne $.Status "Rejected")}} disabled{{end}}>
                         {{$j.Label}}
                     </button>
                 {{end}}

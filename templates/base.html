@@ -1,4 +1,10 @@
 {{define "base"}}
+{{ $otherId := 0}}
+{{ if eq $.User.Id 0}}
+    {{ $otherId = 1}}
+{{ else }}
+    {{ $otherId = 0}}
+{{end}}
 <!doctype html>
 <html lang='en'>
     <head>
@@ -10,6 +16,8 @@
     <body>
         <header>
             <h1><a href='/'>Snippetbox</a></h1>
+            <input type="hidden" id="otherId" name="otherId" value="{{ $otherId }}">
+            <button hx-post="/switch-user" hx-include="#otherId">Switch User</button>
         </header>
         <main>
             {{template "main" .}}

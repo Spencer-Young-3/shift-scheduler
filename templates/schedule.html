@@ -2,10 +2,13 @@
 
 {{define "main"}}
     <h2>Schedule</h2>
-    <form id="schedule-form" hx-post="/schedule/{{$.Schedule.Id}}" hx-target="result">
-        {{template "week_view" .}}
+    <!-- <form id="schedule-form" hx-post="/schedule" hx-trigger="submit" hx-disabled-elt="#scheduler button" hx-swap="innerHTML" hx-target="#status-title"></form> -->
+    <form id="schedule-form" hx-post="/schedule" hx-trigger="submit" hx-disabled-elt="#scheduler button" hx-target="#scheduler-wrapper" hx-swap="innerHTML">
+        <div id="scheduler-wrapper">
+            {{template "week_view" .}}
+        </div>
         <input type="hidden" name="slots" id="slots">
-        <button onclick="submitForm()"{{if ne $.Status "Draft"}} disabled{{end}}>Submit</button>
+        <button onclick="submitForm()"{{if and (ne $.Status "Draft") (ne $.Status "Rejected")}} disabled{{end}}>Submit</button>
     </form>
 
 <script>
@@ -46,13 +49,17 @@ function processSlot(el) {
     // if (touched.has(slot)) return
     // touched.add(slot)
 
-    if (mode === "add" && !el.disabled) {
-        // selected.add(slot)
-        setSelected(el, true)
-    } else {
-        // selected.delete(slot)
-        setSelected(el, false)
+    if (!el.disabled) {
+        
+        if (mode === "add") {
+            // selected.add(slot)
+            setSelected(el, true)
+        } else {
+            // selected.delete(slot)
+            setSelected(el, false)
+        }
     }
+
 
     // syncHiddenInput()
 }
