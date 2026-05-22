@@ -12,12 +12,19 @@
         <title>{{template "title" .}}</title>
         <link rel='stylesheet' href='/static/main.css'>
         <script src="/static/htmx.min.js"></script>
+        <script src="/static/week_view.js"></script>
     </head>
     <body>
         <header>
-            <h1><a href='/'>Snippetbox</a></h1>
+            <h1>Shift Scheduler</h1>
             <input type="hidden" id="otherId" name="otherId" value="{{ $otherId }}">
-            <button hx-post="/switch-user" hx-include="#otherId">Switch User</button>
+            <button hx-post="/switch-user" hx-include="#otherId">Switch to {{ if eq $.User.Id 0 }}Admin{{else}}Student{{end}}</button>
+            <nav>
+                <ul>
+                    <li><a href="/schedule">Schedule</a></li>
+                    {{if eq $.User.Role "admin"}} <li><a href="/approval">Approval</a></li> {{end}}
+                </ul>
+            </nav>
         </header>
         <main>
             {{template "main" .}}

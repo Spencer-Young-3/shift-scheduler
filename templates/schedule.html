@@ -11,6 +11,7 @@
         <button onclick="submitForm()"{{if and (ne $.Status "Draft") (ne $.Status "Rejected")}} disabled{{end}}>Submit</button>
     </form>
 
+<script src="/static/week_view.js"></script>
 <script>
 const scheduler = document.querySelector("#scheduler")
 const hidden = document.querySelector("#slots")
@@ -60,6 +61,8 @@ function processSlot(el) {
         }
     }
 
+    calculateTotals()
+
 
     // syncHiddenInput()
 }
@@ -93,6 +96,10 @@ scheduler.addEventListener("pointerover", e => {
 
 window.addEventListener("pointerup", () => {
     dragging = false
+})
+
+window.addEventListener("load", (event) => {
+    calculateTotals()
 })
 </script>
 {{end}}

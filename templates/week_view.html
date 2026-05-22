@@ -2,9 +2,11 @@
 <div id="scheduler">
     <h2 id="status-title">{{.Status}}</h2>
     <span>{{ if ne .Schedule.Msg nil }}{{.Schedule.Msg}}{{end}}</span>
+    <span></span>
     {{range $i := .Days}}
-        <div class="day-column" data-day="{{$i}}">
+        <div class="day-row" data-day="{{$i}}" id="day-{{$i}}">
             {{range  $j := $.HourRows}}
+                <span>{{$j.Label}}</span>
                 {{range $k := .Slots}}
                     {{$key := printf "%vT%v" $i $k}}
                     <button
@@ -16,7 +18,13 @@
                     </button>
                 {{end}}
             {{end}}
+            <div class="day-total">
+                <span>Total: </span><span id="day-total-{{$i}}">0.00</span><span> hrs.</span>
+            </div>
         </div>
     {{end}}
+    <div class="week-total">
+        <span>Weekly Total: </span><span id="week-total-value">0.00</span><span> hrs.</span>
+    </div>
 </div>
 {{end}}

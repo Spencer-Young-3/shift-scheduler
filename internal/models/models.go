@@ -11,6 +11,11 @@ type User struct {
 	ScheduleId int
 }
 
+type HourRow struct{
+	Label string
+	Slots []int
+}
+
 // func (u User) String() string {
 // 	return fmt.Sprintf("")
 // }
@@ -20,6 +25,16 @@ type Schedule struct {
 	UserId int
 	Status string
 	Slots map[string]bool
+	Msg *string
+}
+
+type ScheduleTemplateData struct {
+	Days []int
+	Slots []int
+	HourRows []HourRow
+	User User
+	Schedule Schedule
+	Status string
 	Msg *string
 }
 

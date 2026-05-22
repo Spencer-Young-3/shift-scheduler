@@ -1,0 +1,10 @@
+{{define "title"}}Approval{{end}}
+
+{{ define "main"}}
+<ul>
+    {{range $i := .ScheduleListRange}}
+        <li><a href="/approval/{{$i}}">{{$i}}</a></li>
+    {{ end }}
+</ul>
+
+{{ end }}
