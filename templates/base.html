@@ -11,15 +11,24 @@
         <meta charset='utf-8'>
         <title>{{template "title" .}}</title>
         <link rel='stylesheet' href='/static/main.css'>
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,100..700;1,100..700&display=swap" rel="stylesheet">
         <script src="/static/htmx.min.js"></script>
         <script src="/static/week_view.js"></script>
     </head>
     <body>
         <header>
-            <h1>Shift Scheduler</h1>
-            <input type="hidden" id="otherId" name="otherId" value="{{ $otherId }}">
-            <button hx-post="/switch-user" hx-include="#otherId">Switch to {{ if eq $.User.Id 0 }}Admin{{else}}Student{{end}}</button>
-            <nav>
+            <div class="byu-header">
+                <div class="header-left">
+                    <h1 id="site-title">Shift Scheduler</h1>
+                    <input type="hidden" id="otherId" name="otherId" value="{{ $otherId }}">
+                </div>
+                <div class="header-right">
+                    <button hx-post="/switch-user" hx-include="#otherId">Switch to {{ if eq $.User.Id 0 }}Admin{{else}}Student{{end}}</button>
+                </div>
+            </div>
+            <nav class="byu-nav">
                 <ul>
                     <li><a href="/schedule">Schedule</a></li>
                     {{if eq $.User.Role "admin"}} <li><a href="/approval">Approval</a></li> {{end}}
