@@ -124,6 +124,16 @@ func postSchedule(w http.ResponseWriter, r *http.Request) {
 		mu.Unlock()
 	} else {
 		log.Print("Not Valid")
+		mu.Lock()
+		newSchedule := models.Schedule{
+			Id: currentUser.ScheduleId,
+			UserId: currentUser.Id,
+			Status: "Draft",
+			Slots: newSlots,
+			Msg: nil,
+		}
+		schedules[currentUser.ScheduleId] = newSchedule
+		mu.Unlock()
 	}
 
 	// response := fmt.Sprintf(

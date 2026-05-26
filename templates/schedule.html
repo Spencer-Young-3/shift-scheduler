@@ -3,7 +3,7 @@
 {{define "main"}}
     <h2>Schedule</h2>
     <!-- <form id="schedule-form" hx-post="/schedule" hx-trigger="submit" hx-disabled-elt="#scheduler button" hx-swap="innerHTML" hx-target="#status-title"></form> -->
-    <form class="schedule-form" id="schedule-form" hx-post="/schedule" hx-disabled-elt="#scheduler button" hx-target="#form-wrapper" hx-swap="outerHTML" onload="calculateTotals()">
+    <form class="schedule-form" id="schedule-form" hx-post="/schedule" hx-disabled-elt="#scheduler button" hx-target="#scheduler-wrapper" hx-swap="innerHTML" onload="calculateTotals()">
         <div id="scheduler-wrapper">
             {{template "schedule_form" .}}
         </div>
@@ -128,6 +128,8 @@ function onLoadFunctionality() {
     window.addEventListener("pointerup", handlePointerUp)
 
     bound = true
+
+    calculateTotals()
 }
 
 onLoadFunctionality()
@@ -150,13 +152,13 @@ document.addEventListener("DOMContentLoaded", (e) => {
     }
 })
 
-// document.body.addEventListener("htmx:afterSwap", (e) => {
-//     console.log("in swap")
-//     if (e.target.id === "scheduler-wrapper") {
-//         onLoadFunctionality()
-//         console.log("ran function")
-//     }
-// })
+document.body.addEventListener("htmx:afterSwap", (e) => {
+    console.log("in swap")
+    if (e.target.id === "scheduler-wrapper") {
+        onLoadFunctionality()
+        console.log("ran function")
+    }
+})
 
 window.addEventListener("load", () => {
     console.log("binding HTMX listener")
@@ -190,6 +192,14 @@ document.addEventListener("htmx:load", () => {
 document.addEventListener("htmx:beforeRequest", () => {
     console.log("beforeRequest fired")
 })
+
+document.body.addEventListener("htmx:beforeRequest", e => console.log("beforeRequest", e.detail))
+document.body.addEventListener("htmx:beforeSwap", e => console.log("beforeSwap", e.detail, "shouldSwap:", e.detail.shouldSwap))
+document.body.addEventListener("htmx:afterSwap", e => console.log("afterSwap", e.detail))
+document.body.addEventListener("htmx:afterRequest", e => console.log("afterRequest", e.detail))
+document.body.addEventListener("htmx:responseError", e => console.log("responseError", e.detail))
+document.body.addEventListener("htmx:swapError", e => console.log("swapError", e.detail))
+document.body.addEventListener("htmx:targetError", e => console.log("targetError", e.detail))
 
 </script>
 {{end}}

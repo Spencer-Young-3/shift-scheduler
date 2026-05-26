@@ -13,3 +13,18 @@ function calculateTotals(){
 window.addEventListener("load", (event) => {
     calculateTotals()
 })
+
+
+/*
+const form = document.querySelector("#schedule-form")
+console.log("Attaching listeners to form")
+
+form.addEventListener("htmx:beforeRequest", e => console.log("beforeRequest", e.detail))
+form.addEventListener("htmx:beforeSwap", e => console.log("beforeSwap", e.detail, "shouldSwap:", e.detail.shouldSwap))
+form.addEventListener("htmx:afterSwap", e => console.log("afterSwap", e.detail))
+form.addEventListener("htmx:afterRequest", e => console.log("afterRequest", e.detail))
+form.addEventListener("htmx:responseError", e => console.log("responseError", e.detail))
+form.addEventListener("htmx:swapError", e => console.log("swapError", e.detail))
+form.addEventListener("htmx:targetError", e => console.log("targetError", e.detail))
+
+*/

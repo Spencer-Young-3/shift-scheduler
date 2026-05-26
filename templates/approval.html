@@ -15,7 +15,7 @@
 <script src="/static/week_view.js"></script>
 <script>
 const status = document.getElementById("status")
-const myForm = document.getElementByid("approval-form")
+const myForm = document.getElementById("approval-form")
 
 function ApproveSchedule() {
     status.value = "Approved"
@@ -27,8 +27,18 @@ function RejectSchedule() {
     myForm.requestSubmit()
 }
 
-window.addEventListener("load", (event) => {
+window.addEventListener("load", () => {
+    console.log("binding HTMX listener")
     calculateTotals()
+
+    document.body.addEventListener("htmx:afterSwap", (e) => {
+        console.log("in swap", e.target)
+        calculateTotals()
+
+        if (e.target && e.target.id === "scheduler-wrapper") {
+            console.log("ran function")
+        }
+    })
 })
 
 </script>
