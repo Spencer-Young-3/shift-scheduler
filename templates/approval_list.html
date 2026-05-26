@@ -1,9 +1,9 @@
 {{define "title"}}Approval{{end}}
 
 {{ define "main"}}
-<ul>
+<ul class="approval-list">
     {{range $i := .ScheduleListRange}}
-        <li><a href="/approval/{{$i}}">{{$i}}</a></li>
+        <li><a href="/approval/{{$i}}">Schedule ID: {{$i}}</a></li>
     {{ end }}
 </ul>
 

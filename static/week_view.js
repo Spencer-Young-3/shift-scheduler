@@ -9,3 +9,7 @@ function calculateTotals(){
     })
     document.getElementById('week-total-value').innerHTML = week_total
 }
+
+window.addEventListener("load", (event) => {
+    calculateTotals()
+})

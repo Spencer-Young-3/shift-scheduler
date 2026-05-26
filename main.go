@@ -30,6 +30,7 @@ func getSchedule(w http.ResponseWriter, r *http.Request) {
 		"templates/base.html",
 		"templates/schedule.html",
 		"templates/week_view.html",
+		"templates/schedule_form.html",
 	}
 	
 	ts, err := template.ParseFiles(files...)
@@ -51,6 +52,13 @@ func getSchedule(w http.ResponseWriter, r *http.Request) {
 	mu.Unlock()
 
 	data := models.ScheduleTemplateData{
+		DayStrings: []string{
+			"Mon.",
+			"Tue.",
+			"Wed.",
+			"Thu.",
+			"Fri.",
+		},
 		Days: makeRange(0, 5), 
 		Slots: makeRange(0, 60),
 		HourRows: []models.HourRow{
@@ -128,14 +136,21 @@ func postSchedule(w http.ResponseWriter, r *http.Request) {
 	mu.Unlock()
 
 	data := createWeekTemplateData(id)
+	log.Print(data)
 
 	// w.Write([]byte(response))
-	ts, err := template.ParseFiles("templates/week_view.html")
+	files := []string{
+		"templates/week_view.html",
+		"templates/schedule_form.html",
+	}
+	
+	ts, err := template.ParseFiles(files...)
+	// ts, err := template.ParseFiles("templates/schedule_form.html")
 	if err != nil {
 		logAndSendError(w, err, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
-	err = ts.ExecuteTemplate(w, "week_view", data)
+	err = ts.ExecuteTemplate(w, "schedule_form", data)
 	if err != nil {
 		logAndSendError(w, err, "Internal Server Error", http.StatusInternalServerError)
 	}
@@ -162,7 +177,7 @@ func validateSchedule(slots map[string]bool) bool {
 			}
 		}
 	}
-	if overall_count < 10 || overall_count > 240 {
+	if overall_count < 120 || overall_count > 240 {
 		return false
 	}
 	return true
@@ -214,6 +229,7 @@ func getApproval(w http.ResponseWriter, r *http.Request) {
 		"templates/base.html",
 		"templates/approval.html",
 		"templates/week_view.html",
+		"templates/schedule_form.html",
 	}
 	
 	ts, err := template.ParseFiles(files...)
@@ -324,6 +340,13 @@ func createWeekTemplateData(id int) models.ScheduleTemplateData {
 	mu.Unlock()
 
 	data := models.ScheduleTemplateData{
+		DayStrings: []string{
+			"Mon.",
+			"Tue.",
+			"Wed.",
+			"Thu.",
+			"Fri.",
+		},
 		Days: makeRange(0, 5), 
 		Slots: makeRange(0, 60),
 		HourRows: []models.HourRow{

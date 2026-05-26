@@ -3,21 +3,20 @@
 {{define "main"}}
     <h2>Schedule</h2>
     <!-- <form id="schedule-form" hx-post="/schedule" hx-trigger="submit" hx-disabled-elt="#scheduler button" hx-swap="innerHTML" hx-target="#status-title"></form> -->
-    <form id="schedule-form" hx-post="/schedule" hx-trigger="submit" hx-disabled-elt="#scheduler button" hx-target="#scheduler-wrapper" hx-swap="innerHTML">
+    <form class="schedule-form" id="schedule-form" hx-post="/schedule" hx-disabled-elt="#scheduler button" hx-target="#form-wrapper" hx-swap="outerHTML" onload="calculateTotals()">
         <div id="scheduler-wrapper">
-            {{template "week_view" .}}
+            {{template "schedule_form" .}}
         </div>
-        <input type="hidden" name="slots" id="slots">
-        <button onclick="submitForm()"{{if and (ne $.Status "Draft") (ne $.Status "Rejected")}} disabled{{end}}>Submit</button>
     </form>
 
 <script src="/static/week_view.js"></script>
 <script>
-const scheduler = document.querySelector("#scheduler")
-const hidden = document.querySelector("#slots")
-const myForm = document.getElementById('schedule-form')
-const selected = new Set()
+let scheduler = document.querySelector("#scheduler")
+let hidden = document.querySelector("#slots")
+let myForm = document.getElementById('schedule-form')
+let selected = new Set()
 
+let bound = false
 let dragging = false
 let mode = "add"
 let touched = new Set()
@@ -67,7 +66,7 @@ function processSlot(el) {
     // syncHiddenInput()
 }
 
-scheduler.addEventListener("pointerdown", e => {
+function handlePointerDown(e) {
     const slot = e.target.closest(".slot")
     if (!slot) return
 
@@ -83,24 +82,115 @@ scheduler.addEventListener("pointerdown", e => {
     }
 
     processSlot(slot)
-})
+}
 
-scheduler.addEventListener("pointerover", e => {
+function handlePointerOver(e) {
     if (!dragging) return
 
     const slot = e.target.closest(".slot")
     if (!slot) return
 
     processSlot(slot)
+}
+
+function handlePointerUp() {
+    dragging = false
+}
+
+function onLoadFunctionality() {
+    if (bound) {
+        scheduler.removeEventListener("pointerdown", handlePointerDown)
+        scheduler.removeEventListener("pointerover", handlePointerOver)
+        window.removeEventListener("pointerup", handlePointerUp)
+    }
+
+    scheduler = document.querySelector("#scheduler")
+    hidden = document.querySelector("#slots")
+    myForm = document.getElementById('schedule-form')
+
+    if (!scheduler || !hidden || !myForm) {
+        console.log("in reload, not valid elements")
+        console.log(scheduler, hidden, myForm)
+    }
+
+    selected = new Set()
+
+    dragging = false
+    mode = "add"
+    touched = new Set()
+
+    scheduler.addEventListener("dragstart", e => {
+        e.preventDefault()
+    })
+
+    scheduler.addEventListener("pointerdown", handlePointerDown)
+    scheduler.addEventListener("pointerover", handlePointerOver)
+    window.addEventListener("pointerup", handlePointerUp)
+
+    bound = true
+}
+
+onLoadFunctionality()
+
+document.addEventListener("htmx:load", () => {
+  console.log("htmx load fired")
 })
 
-window.addEventListener("pointerup", () => {
-    dragging = false
+// ["htmx:afterSwap", "htmx:afterRequest", "htmx:load"].forEach(evt => {
+//   document.addEventListener(evt, () => {
+//     console.log("EVENT:", evt)
+//   })
+// })
+
+document.addEventListener("DOMContentLoaded", (e) => {
+    console.log("in swap")
+    if (e.target.id === "scheduler-wrapper") {
+        onLoadFunctionality()
+        console.log("ran function")
+    }
+})
+
+// document.body.addEventListener("htmx:afterSwap", (e) => {
+//     console.log("in swap")
+//     if (e.target.id === "scheduler-wrapper") {
+//         onLoadFunctionality()
+//         console.log("ran function")
+//     }
+// })
+
+window.addEventListener("load", () => {
+    console.log("binding HTMX listener")
+
+    document.body.addEventListener("htmx:afterSwap", (e) => {
+        console.log("in swap", e.target)
+
+        if (e.target && e.target.id === "scheduler-wrapper") {
+            onLoadFunctionality()
+            console.log("ran function")
+        }
+    })
 })
 
 window.addEventListener("load", (event) => {
     calculateTotals()
 })
+
+console.log("A: script loaded")
+
+console.log("B: htmx =", window.htmx)
+
+document.addEventListener("htmx:afterSwap", () => {
+    console.log("C: afterSwap fired")
+})
+
+document.addEventListener("htmx:load", () => {
+    console.log("D: htmx load fired")
+})
+
+document.addEventListener("htmx:beforeRequest", () => {
+    console.log("beforeRequest fired")
+})
+
 </script>
 {{end}}
 

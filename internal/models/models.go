@@ -29,6 +29,7 @@ type Schedule struct {
 }
 
 type ScheduleTemplateData struct {
+	DayStrings []string
 	Days []int
 	Slots []int
 	HourRows []HourRow

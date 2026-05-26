@@ -5,6 +5,14 @@
     font-family: "IBM Plex Sans", Helvetica, Arial, sans-serif;
 }
 
+h2 {
+    padding: .5rem;
+}
+
+h3 {
+    padding: .5rem;
+}
+
 ul {
     list-style: none;
 }
@@ -19,6 +27,10 @@ ul {
     padding: 1.5rem;
 }
 
+.byu-header button{
+    text-decoration: none;
+}
+
 .header-left,
 .header-right{
     display: flex;
@@ -30,20 +42,124 @@ ul {
     background-color: #FFFFFF;
     color: #002E5D;
     display: flex;
-    /* flex-direction: column; */
+    flex-direction: row;
     align-items: center;
     padding: 1rem;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
+.switch-roles-btn {
+    background: #FFFFFF;
+    color: #002E5D;
+    border: 1px solid;
+    border-radius: 10px;
+    padding: 10px 18px;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.schedule-submit-btn {
+    color: #FFFFFF;
+    background: #0047BA;
+    border: 1px solid;
+    border-radius: 10px;
+    padding: 8px 15px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.approval-btn {
+    color: #FFFFFF;
+    background: #006141;
+    border: 1px solid;
+    border-radius: 10px;
+    padding: 8px 15px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.rejection-btn {
+    color: #FFFFFF;
+    background: #A3082A;
+    border: 1px solid;
+    border-radius: 10px;
+    padding: 8px 15px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.approval-list a{
+    padding: .5rem;
+    color: #002E5D;
+    margin: 1rem;
+    /* text-decoration: none; */
+}
+
+.approval_list a {
+
+}
+
+.byu-nav ul{
+    display: flex;
+}
+
 .byu-nav a {
     color: #002E5D;
     text-decoration: none;
+    padding: 1.5rem
+}
+
+.approval-form{
+    padding: .5rem;
+}
+
+.schedule-form {
+    padding: .5rem;
+}
+
+.week-total {
+    padding: .5rem
+}
+
+.week-labels {
+    display: flex;
+    justify-content: space-evenly;
+    padding: .5rem;
+    width: 726px;
+}
+
+td {
+    width: 80px;
+    display: flex;
+    gap: 1px;
 }
 
 
 .selected {
     background-color: #0047BA;
     color: #FFFFFF;
+}
+
+.slot-border {
+    border: thin solid grey;
+}
+
+.day-row {
+    display: flex;
+    gap: 1px;
+    padding: .5rem;
+}
+
+/* .slot-container {
+
+} */
+
+.slot {
+    width: 12px;
+    height: 45px;
+    margin: 0;
+    padding: 0;
+    border: none;
+    outline: none;
 }
 

@@ -2,13 +2,13 @@
 
 {{define "main"}}
     <h2>Approval</h2>
-    <form id="approval-form" hx-post="/approval/{{$.Schedule.Id}}" hx-target="#scheduler-wrapper">
-        <button onclick="ApproveSchedule()">Approve</button>
-        <button onclick="RejectSchedule()">Reject</button>
+    <form class="approval-form" id="approval-form" hx-post="/approval/{{$.Schedule.Id}}" hx-target="#scheduler-wrapper">
+        <button class="approval-btn" onclick="ApproveSchedule()">Approve</button>
+        <button class="rejection-btn" onclick="RejectSchedule()">Reject</button>
         <input id="status" type="hidden" value="" name="status"></input>
         <textarea id="msg" name="msg"></textarea>
     </form>
-    <div id="scheduler-wrapper">
+    <div style="padding: .5rem" id="scheduler-wrapper">
         {{template "week_view" .}}
     </div>
 
@@ -27,6 +27,9 @@ function RejectSchedule() {
     myForm.requestSubmit()
 }
 
+window.addEventListener("load", (event) => {
+    calculateTotals()
+})
 
 </script>
 

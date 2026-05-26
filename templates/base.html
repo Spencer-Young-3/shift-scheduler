@@ -25,7 +25,7 @@
                     <input type="hidden" id="otherId" name="otherId" value="{{ $otherId }}">
                 </div>
                 <div class="header-right">
-                    <button hx-post="/switch-user" hx-include="#otherId">Switch to {{ if eq $.User.Id 0 }}Admin{{else}}Student{{end}}</button>
+                    <button hx-post="/switch-user" hx-include="#otherId" class="switch-roles-btn">Switch to {{ if eq $.User.Id 0 }}Admin{{else}}Student{{end}}</button>
                 </div>
             </div>
             <nav class="byu-nav">
@@ -38,7 +38,7 @@
         <main>
             {{template "main" .}}
         </main>
-        <footer>Powered by <a href='https://go.dev/'>Go</a></footer>
+        <!-- <footer>Powered by <a href='https://go.dev/'>Go</a></footer> -->
     </body>
 </html>
 {{end}}

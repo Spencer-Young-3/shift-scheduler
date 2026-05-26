@@ -1,0 +1,5 @@
+{{define "schedule_form"}}
+    {{template "week_view" .}}
+    <input type="hidden" name="slots" id="slots">
+    {{if or (eq $.Status "Draft") (eq $.Status "Rejected")}}<button type="button" class="schedule-submit-btn" onclick="submitForm()">Submit</button>{{end}}
+{{end}}
