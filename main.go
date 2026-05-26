@@ -86,7 +86,6 @@ func getSchedule(w http.ResponseWriter, r *http.Request) {
 }
 
 func postSchedule(w http.ResponseWriter, r *http.Request) {
-	// jsonData := []byte(r.FormValue("slots"))
 
 	var slots []string
 	err := json.Unmarshal([]byte(r.FormValue("slots")), &slots)
@@ -100,13 +99,6 @@ func postSchedule(w http.ResponseWriter, r *http.Request) {
 		newSlots[slots[i]] = true
 	}
 
-	// mu.Lock()
-	// for k, v := range schedules[currentUser.ScheduleId].Slots {
-	// 	newSlots[k] = v
-	// }
-	// mu.Unlock()
-
-	// var newStatus string
 	valid := validateSchedule(newSlots)
 	if valid {
 		w.WriteHeader(http.StatusCreated)
@@ -120,7 +112,6 @@ func postSchedule(w http.ResponseWriter, r *http.Request) {
 			Msg: nil,
 		}
 		schedules[currentUser.ScheduleId] = newSchedule
-		// newStatus = newSchedule.Status
 		mu.Unlock()
 	} else {
 		log.Print("Not Valid")
@@ -136,26 +127,18 @@ func postSchedule(w http.ResponseWriter, r *http.Request) {
 		mu.Unlock()
 	}
 
-	// response := fmt.Sprintf(
-	// 	"<h2 id=\"status-title\">%v</h2>",
-	// 	newStatus,
-	// )
-
 	mu.Lock()
 	id := currentUser.ScheduleId
 	mu.Unlock()
 
 	data := createWeekTemplateData(id)
-	log.Print(data)
 
-	// w.Write([]byte(response))
 	files := []string{
 		"templates/week_view.html",
 		"templates/schedule_form.html",
 	}
 	
 	ts, err := template.ParseFiles(files...)
-	// ts, err := template.ParseFiles("templates/schedule_form.html")
 	if err != nil {
 		logAndSendError(w, err, "Internal Server Error", http.StatusInternalServerError)
 		return
@@ -276,10 +259,6 @@ func postApproval(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	log.Print("In Post")
-	log.Print(r.FormValue("status"))
-	log.Print(r.FormValue("msg"))
-
 	status := r.FormValue("status")
 	msg := r.FormValue("msg")
 
@@ -327,12 +306,10 @@ func switchUser(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		logAndSendError(w, err, "Not a valid ID number", http.StatusInternalServerError)
 	}
-	log.Print(currentUser)
-	log.Print(id)
+
 	mu.Lock()
 	currentUser = users[id]
 	mu.Unlock()
-	log.Print(currentUser.Role)
 	w.Header().Add("HX-Refresh", "true")
 	w.WriteHeader(http.StatusCreated)
 }
@@ -380,10 +357,6 @@ func createWeekTemplateData(id int) models.ScheduleTemplateData {
 	return data
 }
 
-func executeWeekViewTemplate() {
-
-}
-
 func makeRange(start, end int) []int {
 	var arr []int
 	for i := start; i < end; i++ {
@@ -403,10 +376,9 @@ func main() {
 	users[0] = models.User{Id: 0, Name: "student1", Role: "student", ScheduleId: 0}
 	users[1] = models.User{Id: 1, Name: "admin1", Role: "admin", ScheduleId: 1}	
 
-	test_shift := make(map[string]bool)
-	test_shift["1T4"] = true
+	log.Print("Listening on Port 4000")
 
-	schedules[0] = models.Schedule{Id: 0, UserId: 0, Status: "Draft", Slots: test_shift, Msg: nil}
+	schedules[0] = models.Schedule{Id: 0, UserId: 0, Status: "Draft", Slots: make(map[string]bool), Msg: nil}
 	schedules[1] = models.Schedule{Id: 1, UserId: 1, Status: "Draft", Slots: make(map[string]bool), Msg: nil}
 	currentUser = users[0]
 

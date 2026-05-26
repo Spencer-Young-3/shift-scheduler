@@ -2,7 +2,6 @@
 
 {{define "main"}}
     <h2>Schedule</h2>
-    <!-- <form id="schedule-form" hx-post="/schedule" hx-trigger="submit" hx-disabled-elt="#scheduler button" hx-swap="innerHTML" hx-target="#status-title"></form> -->
     <form class="schedule-form" id="schedule-form" hx-post="/schedule" hx-disabled-elt="#scheduler button" hx-target="#scheduler-wrapper" hx-swap="innerHTML" onload="calculateTotals()">
         <div id="scheduler-wrapper">
             {{template "schedule_form" .}}
@@ -46,24 +45,17 @@ function setSelected(el, active) {
 function processSlot(el) {
     const slot = el.dataset.slot
 
-    // if (touched.has(slot)) return
-    // touched.add(slot)
-
     if (!el.disabled) {
         
         if (mode === "add") {
-            // selected.add(slot)
             setSelected(el, true)
         } else {
-            // selected.delete(slot)
             setSelected(el, false)
         }
     }
 
     calculateTotals()
 
-
-    // syncHiddenInput()
 }
 
 function handlePointerDown(e) {
@@ -134,25 +126,7 @@ function onLoadFunctionality() {
 
 onLoadFunctionality()
 
-document.addEventListener("htmx:load", () => {
-  console.log("htmx load fired")
-})
-
-// ["htmx:afterSwap", "htmx:afterRequest", "htmx:load"].forEach(evt => {
-//   document.addEventListener(evt, () => {
-//     console.log("EVENT:", evt)
-//   })
-// })
-
 document.addEventListener("DOMContentLoaded", (e) => {
-    console.log("in swap")
-    if (e.target.id === "scheduler-wrapper") {
-        onLoadFunctionality()
-        console.log("ran function")
-    }
-})
-
-document.body.addEventListener("htmx:afterSwap", (e) => {
     console.log("in swap")
     if (e.target.id === "scheduler-wrapper") {
         onLoadFunctionality()
@@ -176,30 +150,6 @@ window.addEventListener("load", () => {
 window.addEventListener("load", (event) => {
     calculateTotals()
 })
-
-console.log("A: script loaded")
-
-console.log("B: htmx =", window.htmx)
-
-document.addEventListener("htmx:afterSwap", () => {
-    console.log("C: afterSwap fired")
-})
-
-document.addEventListener("htmx:load", () => {
-    console.log("D: htmx load fired")
-})
-
-document.addEventListener("htmx:beforeRequest", () => {
-    console.log("beforeRequest fired")
-})
-
-document.body.addEventListener("htmx:beforeRequest", e => console.log("beforeRequest", e.detail))
-document.body.addEventListener("htmx:beforeSwap", e => console.log("beforeSwap", e.detail, "shouldSwap:", e.detail.shouldSwap))
-document.body.addEventListener("htmx:afterSwap", e => console.log("afterSwap", e.detail))
-document.body.addEventListener("htmx:afterRequest", e => console.log("afterRequest", e.detail))
-document.body.addEventListener("htmx:responseError", e => console.log("responseError", e.detail))
-document.body.addEventListener("htmx:swapError", e => console.log("swapError", e.detail))
-document.body.addEventListener("htmx:targetError", e => console.log("targetError", e.detail))
 
 </script>
 {{end}}
