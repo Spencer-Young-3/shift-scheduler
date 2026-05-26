@@ -1,7 +1,7 @@
 # shift-scheduler
 The capstone assignment for OIT Full Stack Training. This repository contains the code for a shift scheduler similar to the one used by OIT.
 
-To run, ensure that you have golang installed on your machine. Then run the following command:
+To run, ensure that you have golang installed on your machine. Navigate to the home directory, then run the following command:
 
 ```console
 go run .

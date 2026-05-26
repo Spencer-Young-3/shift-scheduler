@@ -7,7 +7,7 @@ function calculateTotals(){
         week_total += Number(total)
         document.getElementById('day-total-' + element.dataset.day).innerHTML = total
     })
-    document.getElementById('week-total-value').innerHTML = week_total
+    document.getElementById('week-total-value').innerHTML = week_total.toFixed(2)
 }
 
 window.addEventListener("load", (event) => {
