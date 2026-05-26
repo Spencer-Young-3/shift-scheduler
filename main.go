@@ -99,7 +99,7 @@ func postSchedule(w http.ResponseWriter, r *http.Request) {
 		newSlots[slots[i]] = true
 	}
 
-	valid := validateSchedule(newSlots)
+	valid, msg := validateSchedule(newSlots)
 	if valid {
 		w.WriteHeader(http.StatusCreated)
 		log.Print("Valid")
@@ -121,7 +121,7 @@ func postSchedule(w http.ResponseWriter, r *http.Request) {
 			UserId: currentUser.Id,
 			Status: "Draft",
 			Slots: newSlots,
-			Msg: nil,
+			Msg: msg,
 		}
 		schedules[currentUser.ScheduleId] = newSchedule
 		mu.Unlock()
@@ -150,7 +150,7 @@ func postSchedule(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func validateSchedule(slots map[string]bool) bool {
+func validateSchedule(slots map[string]bool) (bool, *string) {
 
 	overall_count := 0
 	for day:=0; day<5; day++ {
@@ -163,17 +163,27 @@ func validateSchedule(slots map[string]bool) bool {
 				overall_count++
 			}
 			if (count > 0 && !ok) || (slot == 59 && count > 0) {
-				if count > 54 || count < 18 {
-					return false
+				if count > 54 {
+					msg := "Shift longer than 9 hours"
+					return false, &msg
+				}
+				if count < 18 {
+					msg := "Shift shorter than 3 hours"
+					return false, &msg
 				}
 				count = 0
 			}
 		}
 	}
-	if overall_count < 120 || overall_count > 240 {
-		return false
+	if overall_count < 120 {
+		msg := "Less than 20 hours"
+		return false, &msg
 	}
-	return true
+	if overall_count > 240 {
+		msg := "More than 40 hours"
+		return false, &msg
+	}
+	return true, nil
 }
 
 func getApprovalList(w http.ResponseWriter, r *http.Request) {
